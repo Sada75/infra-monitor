@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState,use } from "react";
+import MapView from "@/components/MapView";
+import VerifyButton from "@/components/VerifyButton";
 
 interface Proof {
   _id: string;
@@ -8,6 +10,7 @@ interface Proof {
   deviceId: string;
   timestamp: number;
   ipfsHash: string;
+  dataHash: string;
   imageUrl: string;
   latitude: number;
   longitude: number;
@@ -50,34 +53,36 @@ export default function ProjectPage({
         Project: {projectId}
       </h1>
 
+      {/* ✅ MAP FIRST */}
+      <div className="mb-8">
+        <MapView proofs={proofs} />
+      </div>
+
       {proofs.length === 0 ? (
         <p>No proofs found.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="space-y-6">
           {proofs.map((proof) => (
-            <div
-              key={proof._id}
-              className="border rounded-lg p-4 shadow"
-            >
+            <div key={proof._id} className="flex gap-4 border p-4 rounded">
               <img
                 src={proof.imageUrl}
-                alt="proof"
-                className="w-full h-48 object-cover rounded"
+                className="w-40 h-28 object-cover rounded"
               />
 
-              <div className="mt-3 text-sm">
-                <p>
-                  <strong>Device:</strong> {proof.deviceId}
-                </p>
-                <p>
-                  <strong>Time:</strong>{" "}
+              <div>
+                <p className="font-semibold">
                   {new Date(proof.timestamp * 1000).toLocaleString()}
                 </p>
+                <p>Device: {proof.deviceId}</p>
                 <p>
-                  <strong>Location:</strong> {proof.latitude},{" "}
-                  {proof.longitude}
+                  Location: {proof.latitude}, {proof.longitude}
                 </p>
               </div>
+
+              <VerifyButton
+                imageUrl={proof.imageUrl}
+                dataHash={proof.dataHash}
+              />
             </div>
           ))}
         </div>

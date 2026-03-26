@@ -5,6 +5,7 @@ const ProofSchema = new mongoose.Schema({
   deviceId: String,
   timestamp: Number,
   ipfsHash: String,
+  dataHash: String,
   latitude: Number,
   longitude: Number,
 });

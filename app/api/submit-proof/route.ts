@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
       deviceId,
       timestamp,
       ipfsHash,
+      dataHash,
       latitude,
       longitude,
     });
