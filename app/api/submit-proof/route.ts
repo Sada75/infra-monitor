@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
 
     // 🔥 1. Upload to IPFS
     console.log("Step 4: Uploading to IPFS");
-    // const ipfsHash = await uploadToIPFS(buffer);
-    const ipfsHash = "test_hash";
+    const ipfsHash = await uploadToIPFS(buffer);
+    // const ipfsHash = "test_hash";
 
     console.log("Step 5: IPFS upload complete");
     // 🔐 2. Generate hash (important for verification later)
