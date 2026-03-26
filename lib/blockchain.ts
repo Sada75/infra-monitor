@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-const CONTRACT_ADDRESS = "0xa4D200847008629635B2d0A887E7F4E4d26A298c";
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS!;
 
 const ABI = [
   "function submitProof(string,string,uint256,string,bytes32)"
