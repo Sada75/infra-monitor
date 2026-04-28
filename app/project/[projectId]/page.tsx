@@ -24,8 +24,13 @@ export default function ProjectPage({
   const [proofs, setProofs] = useState<Proof[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDevice , setSelectedDevice] = useState<string | null>(null);
 
   const { projectId } = use(params);
+
+  useEffect(() => {
+    setSelectedDevice(null);
+  }, [selectedDate])
 
   useEffect(() => {
     async function fetchProofs() {
@@ -57,10 +62,16 @@ export default function ProjectPage({
     return acc;
   }, {})
 
+  const proofsForDate = selectedDate ? groupedProofs[selectedDate] : proofs;
+
+  const deviceIds = Array.from(
+    new Set(proofsForDate.map((p : Proof) => p.deviceId))
+  );
+
   const dates = Object.keys(groupedProofs);
 
-  const displayedProofs = selectedDate ? 
-    groupedProofs[selectedDate] : proofs;
+  const displayedProofs = selectedDevice ? 
+    proofsForDate.filter((p : Proof) => p.deviceId === selectedDevice) : proofsForDate;
 
   return (
   <div
@@ -130,7 +141,7 @@ export default function ProjectPage({
         </span>
       </div>
       <div className="p-4">
-        <MapView proofs={proofs} />
+        <MapView proofs={displayedProofs} />
       </div>
     </div>
 
@@ -147,6 +158,22 @@ export default function ProjectPage({
           : "bg-white/10 text-white/70"}`}
         >
           {date}
+        </button>
+      ))}
+    </div>
+
+    <div className="flex gap-3 mb-6 flex-wrap">
+      {deviceIds.map((device : any) => (
+        <button
+          key={device}
+          onClick={() => setSelectedDevice(device)}
+          className={`px-3 py-1 rounded-lg text-sm transition ${
+            selectedDevice === device
+              ? "bg-green-500 text-white"
+              : "bg-white/10 text-white/70"
+          }`}
+        >
+          {device}
         </button>
       ))}
     </div>

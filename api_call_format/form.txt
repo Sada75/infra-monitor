@@ -1,6 +1,6 @@
 image : 
 projectId : bridge_001
 deviceId : node_B
-timestamp : 1711357200
+timestamp : 1774396800
 latitude : 12.9720
 longitude : 77.5950
