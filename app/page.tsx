@@ -13,6 +13,17 @@ export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const FILTER_CATEGORIES = ["bridge", "canal", "road", "tunnel", "dam", "highway"];
+  const [activeFilter, setActiveFilter] = useState("all");
+
+
+  const filteredProjects =
+  activeFilter === "all"
+    ? projects
+    : projects.filter((p) =>
+        p._id.toLowerCase().includes(activeFilter.toLowerCase())
+      );
+
   useEffect(() => {
     async function fetchProjects() {
       try {
@@ -61,8 +72,69 @@ export default function Home() {
       </p>
     </div>
 
+    {/* Filter Bar */}
+    <div
+      className="mb-6 p-4 rounded-2xl flex flex-wrap gap-2"
+      style={{
+        background: "rgba(255, 255, 255, 0.04)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        border: "1px solid rgba(255, 255, 255, 0.08)",
+      }}
+    >
+      {/* "All" pill */}
+      <button
+        onClick={() => setActiveFilter("all")}
+        style={{
+          padding: "6px 16px",
+          borderRadius: "999px",
+          border: activeFilter === "all"
+            ? "1px solid rgba(139,92,246,0.6)"
+            : "1px solid rgba(255,255,255,0.12)",
+          background: activeFilter === "all"
+            ? "rgba(139,92,246,0.25)"
+            : "rgba(255,255,255,0.06)",
+          color: activeFilter === "all"
+            ? "rgba(196,181,253,0.95)"
+            : "rgba(255,255,255,0.6)",
+          fontSize: "13px",
+          cursor: "pointer",
+          transition: "all 0.2s",
+        }}
+      >
+        All
+      </button>
+
+      {/* Category pills */}
+      {FILTER_CATEGORIES.map((cat) => (
+        <button
+          key={cat}
+          onClick={() => setActiveFilter(cat)}
+          style={{
+            padding: "6px 16px",
+            borderRadius: "999px",
+            border: activeFilter === cat
+              ? "1px solid rgba(139,92,246,0.6)"
+              : "1px solid rgba(255,255,255,0.12)",
+            background: activeFilter === cat
+              ? "rgba(139,92,246,0.25)"
+              : "rgba(255,255,255,0.06)",
+            color: activeFilter === cat
+              ? "rgba(196,181,253,0.95)"
+              : "rgba(255,255,255,0.6)",
+            fontSize: "13px",
+            cursor: "pointer",
+            transition: "all 0.2s",
+            textTransform: "capitalize",
+          }}
+        >
+          {cat.charAt(0).toUpperCase() + cat.slice(1)}
+        </button>
+      ))}
+    </div>
+
     {/* Empty state */}
-    {projects.length === 0 ? (
+    {filteredProjects.length === 0 ? (
       <div
         className="flex flex-col items-center justify-center py-20 rounded-2xl"
         style={{
@@ -76,28 +148,34 @@ export default function Home() {
           className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
           style={{ background: "rgba(255,255,255,0.08)" }}
         >
-          <svg
-            className="w-8 h-8"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="rgba(255,255,255,0.4)"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M3 7h18M3 12h18M3 17h18"
-            />
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.4)">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7h18M3 12h18M3 17h18" />
           </svg>
         </div>
         <p className="text-lg font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>
           No projects found
         </p>
+        {activeFilter !== "all" && (
+          <button
+            onClick={() => setActiveFilter("all")}
+            style={{
+              marginTop: "12px",
+              fontSize: "13px",
+              color: "rgba(167,139,250,0.8)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
+            Clear filter
+          </button>
+        )}
       </div>
     ) : (
       /* Project Grid */
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {projects.map((project) => (
+        {filteredProjects.map((project) => (
           <Link
             key={project._id}
             href={`/project/${project._id}`}

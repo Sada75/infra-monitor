@@ -23,6 +23,7 @@ export default function ProjectPage({
 }) {
   const [proofs, setProofs] = useState<Proof[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const { projectId } = use(params);
 
@@ -46,6 +47,20 @@ export default function ProjectPage({
   }, [projectId]);
 
   if (loading) return <div className="p-6">Loading...</div>;
+
+  const groupedProofs = proofs.reduce((acc : any ,proof) => {
+    const date = new Date(proof.timestamp * 1000).toDateString();
+    
+    if(!acc[date]) acc[date] = [];
+    acc[date].push(proof);
+
+    return acc;
+  }, {})
+
+  const dates = Object.keys(groupedProofs);
+
+  const displayedProofs = selectedDate ? 
+    groupedProofs[selectedDate] : proofs;
 
   return (
   <div
@@ -119,8 +134,25 @@ export default function ProjectPage({
       </div>
     </div>
 
+    {/* Date Filter */}
+
+    <div className = "flex gap-3 mb-6 flex-wrap">
+      {dates.map((date) => (
+        <button
+          key = {date}
+          onClick={() => setSelectedDate(date)}
+          className = {`px-4 py-2 rounded-xl text-sm transition ${
+            selectedDate === date
+          ? "bg-purple-500 text-white"
+          : "bg-white/10 text-white/70"}`}
+        >
+          {date}
+        </button>
+      ))}
+    </div>
+
     {/* Proofs List */}
-    {proofs.length === 0 ? (
+    {displayedProofs.length === 0 ? (
       <div
         className="flex flex-col items-center justify-center py-20 rounded-2xl"
         style={{
@@ -157,11 +189,11 @@ export default function ProjectPage({
             />
           </svg>
           <span className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
-            {proofs.length} proof{proofs.length !== 1 ? "s" : ""} submitted
+            {displayedProofs.length} proof{displayedProofs.length !== 1 ? "s" : ""} submitted
           </span>
         </div>
 
-        {proofs.map((proof) => (
+        {displayedProofs.map((proof : Proof) => (
           <div
             key={proof._id}
             className="flex gap-5 p-5 rounded-2xl transition-all duration-300"

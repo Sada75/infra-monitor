@@ -77,18 +77,31 @@ export async function POST(req: NextRequest) {
       longitude,
     });
 
-    return NextResponse.json({
-      message: "Proof stored successfully",
-      ipfsHash,
-      txHash,
-      proof,
-    });
+    return new NextResponse(
+      JSON.stringify({ 
+        message: "Proof submitted successfully", 
+        ipfsHash,
+        txHash ,
+        proof,
+      }),
+      {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
+    );
   } catch (error) {
-    console.error("ERROR:", error);
-
-    return NextResponse.json(
-      { error: "Failed to process proof" },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({ error: "Failed to process proof" }),
+      {
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
   }
 }
