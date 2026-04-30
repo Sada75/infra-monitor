@@ -25,6 +25,8 @@ export default function ProjectPage({
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDevice , setSelectedDevice] = useState<string | null>(null);
+  const [analysis , setAnalysis] = useState<string | null>(null);
+  const [analyzing , setAnalyzing] = useState(false);
 
   const { projectId } = use(params);
 
@@ -50,6 +52,29 @@ export default function ProjectPage({
 
     fetchProofs();
   }, [projectId]);
+
+  async function handleAnalyze(){
+    setAnalyzing(true);
+
+    try{
+      const res = await fetch("/api/analyze",{
+        method : "POST", 
+        headers : {
+          "Content-Type" : "application/json",
+        },
+        body : JSON.stringify({
+          proofs : displayedProofs,
+        }),
+      });
+
+      const data = await res.json();
+      setAnalysis(data.analysis);
+    }catch(err){
+      console.error(err);
+    }finally{
+      setAnalyzing(false);
+    }
+  }
 
   if (loading) return <div className="p-6">Loading...</div>;
 
@@ -162,6 +187,18 @@ export default function ProjectPage({
       ))}
     </div>
 
+    {/* side panel for analysis */}
+
+    {analysis && (
+      <div className="fixed right-0 top-0 h-full w-96 bg-black/80 p-6 overflow-y-auto">
+        <h2 className="text-xl font-bold mb-4 text-white">AI Analysis</h2>
+
+        <p className="text-sm text-white/80 whitespace-pre-line">
+          {analysis}
+        </p>
+      </div>
+    )}
+
     <div className="flex gap-3 mb-6 flex-wrap">
       {deviceIds.map((device : any) => (
         <button
@@ -177,6 +214,13 @@ export default function ProjectPage({
         </button>
       ))}
     </div>
+
+    <button
+      onClick={handleAnalyze}
+      className="px-4 py-2 bg-purple-600 text-white rounded-xl"
+    >
+      {analyzing ? "Analyzing..." : "Analyze"}
+    </button>
 
     {/* Proofs List */}
     {displayedProofs.length === 0 ? (
