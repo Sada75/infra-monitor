@@ -1,5 +1,6 @@
 import { NextRequest , NextResponse } from "next/server";
 
+
 async function imageUrlToBase64(url : string) : Promise<string>{
     console.log(url);
     const res = await fetch(url);
@@ -26,20 +27,18 @@ export async function POST(req : NextRequest){
             selectedImages.map((url : string) => imageUrlToBase64(url))
         );
 
-        const response = await fetch("https://api.openai.com/v1/responses",{
+        const response = await fetch(
+            "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=" + process.env.GEMINI_API_KEY,{
             method : "POST",
             headers : {
                 "Content-Type" : "application/json",
-                "Authorization" : `Bearer ${process.env.OPENAI_API_KEY}`
             },
             body : JSON.stringify({
-                model : "gpt-4.1-mini",
-                input : [
+                contents : [
                     {
                         role : "user", 
-                        content : [
+                        parts : [
                             {
-                                type : "input_text",
                                 text : `You are analyzing infrastructure progress.
 
                                         For these images:
@@ -50,10 +49,14 @@ export async function POST(req : NextRequest){
 
                                         Be concise and structured.`
                             },
-                            ...base64Images.map((b64) => ({
-                                type : "input_image",
-                                image_url : `data:image/jpeg;base64,${b64}`
-                            }))
+                            ...base64Images.map((img : string) => ({
+                                inline_data : {
+                                    mime_type : "image/jpeg",
+                                    data : img
+                                }
+                            }
+                                
+                            )),
                         ]
                     }
                 ]
@@ -61,11 +64,10 @@ export async function POST(req : NextRequest){
         })
 
         const data = await response.json();
-
-        console.log("OpenAI RAW response:", JSON.stringify(data, null, 2));
+        console.log("Gemini RAW response:", JSON.stringify(data, null, 2));
 
         return NextResponse.json({
-            analysis : data.output?.[0]?.content?.[0]?.text || "no response",
+            analysis : data.candidates?.[0]?.content?.parts?.[0]?.text || "No analysis generated",
         });
     }catch(err){
         console.error(err);
