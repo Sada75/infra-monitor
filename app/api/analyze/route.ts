@@ -19,8 +19,8 @@ export async function POST(req : NextRequest){
         //extract image urls 
         const images = proofs.map((p : any) => p.imageUrl);
 
-        //limit images to 5 for analysis
-        const selectedImages = images.slice(0,5);
+        
+        const selectedImages = images;
 
         const base64Images = await Promise.all(
             selectedImages.map((url : string) => imageUrlToBase64(url))
@@ -40,7 +40,7 @@ export async function POST(req : NextRequest){
                         content : [
                             {
                                 type : "input_text",
-                                text : `You are analyzing infrastructure progress.
+                                text : `You are analyzing infrastructure progress , for now I am using book stack for simulating wall construction , so consider the books as wall and give the results. in the analysis , don't mention it as books, mention them as wall itself as if you are looking at real wall.
 
                                         For these images:
                                         1. Describe progress level
